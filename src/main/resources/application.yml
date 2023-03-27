@@ -1,0 +1,5 @@
+server:
+  port: 8080
+
+nasa:
+  api-key: aKQYvWiVFkhaoSKQKtKmgE2XyOzd0gAUxWk69jnd
