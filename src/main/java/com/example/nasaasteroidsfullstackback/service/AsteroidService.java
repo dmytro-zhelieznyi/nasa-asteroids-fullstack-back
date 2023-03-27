@@ -15,12 +15,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Service
@@ -30,46 +30,40 @@ public class AsteroidService {
     private final NasaProperties nasaProperties;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private final ExecutorService executorService;
+    private final WebClient webClient;
 
-    @SneakyThrows
-    public NeoFeed getAllAsteroids(String startDate, String endDate) {
+    public Mono<NeoFeed> getAllAsteroids(String startDate, String endDate) {
         List<DatePair> datePairs = DatePairGenerator.generateDatePairs(startDate, endDate);
         NeoFeed neoFeed = NeoFeed.builder()
                 .elementCount(0L)
                 .nearEarthObjects(new ConcurrentHashMap<>())
                 .build();
 
-        datePairs.forEach(datePair -> {
-            try {
-                CompletableFuture.runAsync(() -> {
+        Flux<DatePair> datePairFlux = Flux.fromIterable(datePairs);
+
+        return datePairFlux.flatMap(datePair -> {
                     log.info("===> Asteroids data pulling for date pair [startDate: {}, endDate: {}]",
                             datePair.getStartDate(), datePair.getEndDate());
-
-                    //TODO replace with Async web client
-                    ResponseEntity<String> response = restTemplate.exchange(
-                            nasaProperties.neoFeedURL(datePair.getStartDate(), datePair.getEndDate()),
-                            HttpMethod.GET,
-                            null,
-                            String.class
-                    );
-                    try {
-                        NeoFeed newNeoFeed = objectMapper.readValue(response.getBody(), NeoFeed.class);
-                        neoFeed.getNearEarthObjects().putAll(newNeoFeed.getNearEarthObjects());
-                        neoFeed.addElementCount(newNeoFeed.getElementCount());
-                    } catch (JsonProcessingException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                    log.info("<=== Asteroids data pulling for date pair [startDate: {}, endDate: {}]",
-                            datePair.getStartDate(), datePair.getEndDate());
-                }, executorService).get();
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e.getMessage(), e);
-            }
-        });
-
-        return neoFeed;
+                    return webClient.get()
+                            .uri(nasaProperties.neoFeedURL(datePair.getStartDate(), datePair.getEndDate()))
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .map(responseBody -> {
+                                try {
+                                    NeoFeed newNeoFeed = objectMapper.readValue(responseBody, NeoFeed.class);
+                                    neoFeed.getNearEarthObjects().putAll(newNeoFeed.getNearEarthObjects());
+                                    neoFeed.addElementCount(newNeoFeed.getElementCount());
+                                } catch (JsonProcessingException e) {
+                                    log.error(e.getMessage(), e);
+                                }
+                                log.info("<=== Asteroids data pulling for date pair [startDate: {}, endDate: {}]",
+                                        datePair.getStartDate(), datePair.getEndDate());
+                                return neoFeed;
+                            });
+                })
+                .reduce((a, b) -> a).switchIfEmpty(Mono.just(neoFeed));
     }
+
 
     @SneakyThrows
     public NeoLookUp getAsteroid(String id) {

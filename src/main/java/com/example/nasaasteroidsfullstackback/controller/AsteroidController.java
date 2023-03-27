@@ -5,6 +5,7 @@ import com.example.nasaasteroidsfullstackback.dto.NeoLookUp;
 import com.example.nasaasteroidsfullstackback.service.AsteroidService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class AsteroidController {
     private final AsteroidService asteroidService;
 
     @GetMapping
-    public NeoFeed getAllAsteroids(
+    public Mono<NeoFeed> getAllAsteroids(
             @RequestParam("start_date") String startDate,
             @RequestParam("end_date") String endDate
     ) {
