@@ -32,6 +32,8 @@ public class NearEarthObject {
     private Boolean isPotentiallyHazardousAsteroid;
     @JsonProperty("close_approach_data")
     private List<CloseApproachData> closeApproachData;
+    @JsonProperty("orbital_data")
+    private OrbitalData orbitalData;
     @JsonProperty("is_sentry_object")
     private Boolean isSentryObject;
 
