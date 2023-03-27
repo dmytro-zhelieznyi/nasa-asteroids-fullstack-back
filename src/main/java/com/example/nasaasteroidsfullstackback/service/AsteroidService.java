@@ -22,13 +22,12 @@ public class AsteroidService {
 
     @SneakyThrows
     public NeoFeed getAllAsteroids(String startDate, String endDate) {
-        var URI = "https://api.nasa.gov/neo/rest/v1/feed?" +
-                "start_date=" + startDate +
-                "&end_date=" + endDate +
-                "&api_key=" + nasaProperties.getApiKey();
-
         ResponseEntity<String> response = restTemplate.exchange(
-                URI, HttpMethod.GET, null, String.class);
+                nasaProperties.neoFeedURL(startDate, endDate),
+                HttpMethod.GET,
+                null,
+                String.class
+        );
 
         if (response.getBody() == null) return null;
 
@@ -39,12 +38,12 @@ public class AsteroidService {
 
     @SneakyThrows
     public NeoLookUp getAsteroid(String id) {
-        var URI = "https://api.nasa.gov/neo/rest/v1/neo/" +
-                id + "?" +
-                "api_key=" + nasaProperties.getApiKey();
-
         ResponseEntity<String> response = restTemplate.exchange(
-                URI, HttpMethod.GET, null, String.class);
+                nasaProperties.neoLookUpURL(id),
+                HttpMethod.GET,
+                null,
+                String.class
+        );
 
         NearEarthObject nearEarthObject = objectMapper.readValue(response.getBody(), NearEarthObject.class);
 
