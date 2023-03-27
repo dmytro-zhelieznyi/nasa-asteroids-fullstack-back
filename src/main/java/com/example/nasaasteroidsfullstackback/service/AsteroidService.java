@@ -2,6 +2,7 @@ package com.example.nasaasteroidsfullstackback.service;
 
 import com.example.nasaasteroidsfullstackback.dto.NearEarthObject;
 import com.example.nasaasteroidsfullstackback.dto.NeoFeed;
+import com.example.nasaasteroidsfullstackback.dto.NeoLookUp;
 import com.example.nasaasteroidsfullstackback.property.NasaProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class AsteroidService {
     }
 
     @SneakyThrows
-    public NearEarthObject getAsteroid(String id) {
+    public NeoLookUp getAsteroid(String id) {
         var URI = "https://api.nasa.gov/neo/rest/v1/neo/" +
                 id + "?" +
                 "api_key=" + nasaProperties.getApiKey();
@@ -47,7 +48,9 @@ public class AsteroidService {
 
         NearEarthObject nearEarthObject = objectMapper.readValue(response.getBody(), NearEarthObject.class);
 
-        return nearEarthObject;
+        return NeoLookUp.builder()
+                .nearEarthObject(nearEarthObject)
+                .build();
     }
 
 }
