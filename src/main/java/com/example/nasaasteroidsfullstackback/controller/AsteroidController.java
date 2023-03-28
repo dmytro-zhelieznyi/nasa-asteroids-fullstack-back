@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/asteroids")
 @RequiredArgsConstructor
@@ -25,7 +23,7 @@ public class AsteroidController {
     }
 
     @GetMapping("/{id}")
-    public NeoLookUp getAsteroid(
+    public Mono<NeoLookUp> getAsteroid(
             @PathVariable("id") String id
     ) {
         return asteroidService.getAsteroid(id);
