@@ -19,7 +19,7 @@ public class DatePairGenerator {
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
 
-        var daysBetween = startDate.until(endDate).getDays();
+        int daysBetween = startDate.until(endDate).getDays();
         List<DatePair> datePairs = new ArrayList<>();
 
         if (daysBetween <= 7) {
@@ -27,7 +27,7 @@ public class DatePairGenerator {
         } else {
             LocalDate nextStartDate = startDate;
 
-            while (nextStartDate.isBefore(endDate)) {
+            while (nextStartDate.isBefore(endDate) || nextStartDate.isEqual(endDate)) {
                 LocalDate nextEndDate = nextStartDate.plusDays(6);
                 if (nextEndDate.isAfter(endDate)) {
                     nextEndDate = endDate;

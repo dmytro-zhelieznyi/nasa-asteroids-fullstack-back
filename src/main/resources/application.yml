@@ -7,6 +7,6 @@ spring:
       request-timeout: 30000 #30 sec
 
 nasa:
-  api-key: {NASA_API_KEY: aKQYvWiVFkhaoSKQKtKmgE2XyOzd0gAUxWk69jnd}
+  api-key: ${NASA_API_KEY:aKQYvWiVFkhaoSKQKtKmgE2XyOzd0gAUxWk69jnd}
   neo-feed-url: https://api.nasa.gov/neo/rest/v1/feed
   neo-look-up-url: https://api.nasa.gov/neo/rest/v1/neo
