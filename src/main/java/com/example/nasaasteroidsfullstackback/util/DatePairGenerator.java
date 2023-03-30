@@ -16,6 +16,8 @@ public class DatePairGenerator {
             return Collections.singletonList(new DatePair(start, end));
         }
 
+        //TODO rewrite dates generating using already cached data to avoid pulling huge count of data
+
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
 

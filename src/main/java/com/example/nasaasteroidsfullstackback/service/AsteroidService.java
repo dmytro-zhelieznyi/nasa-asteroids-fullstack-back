@@ -48,6 +48,7 @@ public class AsteroidService {
                             NeoFeed newNeoFeed = objectMapper.readValue(body, NeoFeed.class);
                             neoFeed.getNearEarthObjects().putAll(newNeoFeed.getNearEarthObjects());
                             neoFeed.addElementCount(newNeoFeed.getElementCount());
+                            // TODO cache new data
                         } catch (JsonProcessingException e) {
                             log.error(e.getMessage(), e);
                         }
