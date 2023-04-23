@@ -1,19 +1,19 @@
 package com.example.nasaasteroidsfullstackback.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 @Setter
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NeoFeed {
     @JsonProperty("links")
     private Map<String, String> links;
@@ -22,7 +22,9 @@ public class NeoFeed {
     @JsonProperty("near_earth_objects")
     private Map<String, List<NearEarthObject>> nearEarthObjects;
 
-    public void addElementCount(Long newElementCount) {
-        elementCount += newElementCount;
+    public NeoFeed reduceOne(NeoFeed neoFeed) {
+        this.elementCount += neoFeed.getElementCount();
+        this.nearEarthObjects.putAll(neoFeed.getNearEarthObjects());
+        return this;
     }
 }
